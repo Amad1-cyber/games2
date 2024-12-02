@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Hub - Othman's Arcade</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: orange;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+    .game-card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .game-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .game-card h2 {
+      margin: 0;
+      padding: 15px;
+      background: orange;
+      color: white;
+    }
+    .game-card p {
+      padding: 15px;
+      font-size: 16px;
+    }
+    .game-card button {
+      width: 100%;
+      padding: 10px;
+      background-color: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .game-card button:hover {
+      background-color: darkgreen;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Othman's Arcade</h1>
+    <p>Your hub for fun, simple games!</p>
+  </header>
+  
+  <div class="container">
+    <!-- Game 1: Snake -->
+    <div class="game-card">
+      <img src="https://via.placeholder.com/800x200?text=Snake+Game" alt="Snake Game">
+      <h2>Snake Game</h2>
+      <p>Control the snake and eat the food while avoiding obstacles! Classic fun for everyone.</p>
+      <button onclick="launchSnakeGame()">Play Now</button>
+    </div>
+    
+    <!-- Add more game cards here -->
+
+  </div>
+  
+  <footer>
+    <p>&copy; 2024 Othman's Arcade. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    function launchSnakeGame() {
+      const gameWindow = window.open('', '_blank', 'width=420,height=450');
+      gameWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Othman's Snake</title>
+          <style>
+            canvas {
+              border: 2px solid black;
+              display: block;
+              margin: 20px auto;
+              background-color: #f0f0f0;
+            }
+            h1 {
+              text-align: center;
+              font-family: Arial, sans-serif;
+              color: orange;
+              font-size: 36px;
+              margin-top: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Othman's Snake</h1>
+          <canvas id="gameCanvas" width="400" height="400"></canvas>
+          <script>
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const box = 20;
+            let snake, direction, food, score;
+
+            function initGame() {
+              snake = [{ x: 10 * box, y: 10 * box }];
+              direction = 'RIGHT';
+              food = {
+                x: Math.floor(Math.random() * (canvas.width / box)) * box,
+                y: Math.floor(Math.random() * (canvas.height / box)) * box,
+              };
+              score = 0;
+            }
+
+            initGame();
+
+            document.addEventListener('keydown', (event) => {
+              if (event.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+              else if (event.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+              else if (event.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+              else if (event.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+            });
+
+            function draw() {
+              ctx.fillStyle = '#f0f0f0';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+              ctx.fillStyle = 'red';
+              ctx.fillRect(food.x, food.y, box, box);
+
+              for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = i === 0 ? 'green' : 'lime';
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                ctx.strokeStyle = 'darkgreen';
+                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+              }
+
+              const head = { x: snake[0].x, y: snake[0].y };
+
+              if (direction === 'UP') head.y -= box;
+              if (direction === 'DOWN') head.y += box;
+              if (direction === 'LEFT') head.x -= box;
+              if (direction === 'RIGHT') head.x += box;
+
+              if (head.x === food.x && head.y === food.y) {
+                score++;
+                food = {
+                  x: Math.floor(Math.random() * (canvas.width / box)) * box,
+                  y: Math.floor(Math.random() * (canvas.height / box)) * box,
+                };
+              } else {
+                snake.pop();
+              }
+
+              snake.unshift(head);
+
+              if (
+                head.x < 0 ||
+                head.y < 0 ||
+                head.x >= canvas.width ||
+                head.y >= canvas.height ||
+                snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
+              ) {
+                alert(\`Game Over! Your score: \${score}\`);
+                initGame();
+              }
+
+              ctx.fillStyle = 'black';
+              ctx.font = '20px Arial';
+              ctx.fillText(\`Score: \${score}\`, 10, 20);
+            }
+
+            setInterval(draw, 100);
+          </script>
+        </body>
+        </html>
+      `;
+    
+  </script>
+</body>
+</html>
